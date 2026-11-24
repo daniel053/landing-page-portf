@@ -299,7 +299,7 @@ function useInView<T extends Element>(ref: RefObject<T>) {
           observer.disconnect();
         }
       },
-      { threshold: 0.35 },
+      { threshold: 0 },
     );
     observer.observe(node);
     return () => observer.disconnect();
