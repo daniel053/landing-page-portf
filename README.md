@@ -1,26 +1,38 @@
-# Portfólio - Daniel Messias dos Santos
+# Portfólio: Daniel Messias dos Santos
 
-Landing page em React + TypeScript para portfólio profissional com foco em recrutadores e lideranças técnicas.
+Landing page em React + TypeScript + Vite, publicada no GitHub Pages.
+
+**Conceito:** um console de operações industrial, com fundo grafite e as cores de uma torre Andon. A narrativa é guiada por resultados: números tirados do histórico git, cases no formato Desafio → O que construí → Resultado, e a integração com hardware como diferencial.
 
 ## Rodando localmente
 
+Requer Node 18+ (o projeto usa Vite 5).
+
 ```bash
-pnpm install
-pnpm dev
+npm install
+npm run dev
 ```
 
 ## Onde editar
 
-- Conteúdo, links sociais, stack, desafios e formação: `src/data/portfolio.ts`
-- Estrutura da página e comentários de implementação: `src/App.tsx`
-- Design system, responsividade e transições: `src/styles.css`
+| O quê | Arquivo |
+| --- | --- |
+| Textos, números, cases, stack, trajetória e links | `src/data/portfolio.ts` |
+| Estrutura das seções | `src/App.tsx` |
+| Visual, cores, responsividade e animações | `src/styles.css` |
 
-## Fotos e currículo
+## Foto
 
-Adicione os arquivos reais na pasta `public`:
+Salve a foto em `public/photos/daniel.jpg` e, em `src/data/portfolio.ts`, troque `photo: null` por:
 
-- `public/photos/daniel-hero.jpg`
-- `public/photos/daniel-setup.jpg`
-- `public/curriculo-daniel-messias.pdf`
+```ts
+photo: `${base}photos/daniel.jpg`,
+```
 
-Os pontos exatos de troca estão comentados em `src/App.tsx`.
+## Deploy
+
+```bash
+npm run deploy
+```
+
+Esse comando gera o build e publica a pasta `dist` na branch `gh-pages`.
