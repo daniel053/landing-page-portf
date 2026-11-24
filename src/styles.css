@@ -2405,11 +2405,11 @@ section[id] {
     mask-image: linear-gradient(to bottom, #000 70%, transparent 98%);
   }
 
+  /* no celular a foto é estreita: a etiqueta sobe para o canto esquerdo, acima do ombro, longe do rosto */
   .portrait-tag {
-    left: auto;
-    right: -14%;
-    top: 30%;
-    transform: rotate(4deg);
+    top: 4%;
+    left: -8%;
+    transform: rotate(-6deg);
   }
 
   .console {
