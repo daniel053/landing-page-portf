@@ -38,8 +38,7 @@ export const profile = {
   available: true,
   email: "danielmessias053@gmail.com",
   cvUrl: `${base}curriculo-daniel-messias.pdf`,
-  // Para usar foto: salve em public/photos/daniel.jpg e troque null por `${base}photos/daniel.jpg`.
-  photo: null as string | null,
+  photo: `${base}photos/daniel-hero.webp` as string | null,
 };
 
 export const whatsAppLink =

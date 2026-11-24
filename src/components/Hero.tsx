@@ -244,11 +244,23 @@ export function Hero() {
                   {heroWords[0]}
                 </span>
               </span>
-              <span className="line" aria-hidden="true">conversarem com o seu ERP.</span>
+              <span className="line" aria-hidden="true">
+                conversarem com <br className="hero-br" />o seu ERP.
+              </span>
             </h1>
             <div className="lens-ring" aria-hidden="true" />
           </div>
         </div>
+
+        {profile.photo ? (
+          <figure className="hero-portrait">
+            <img src={profile.photo} alt={`Ilustração de ${profile.shortName} com headset e camiseta de dev`} width={900} height={942} />
+            <figcaption className="portrait-tag">
+              <span className="status-dot" aria-hidden="true" />
+              oi, eu sou o Daniel
+            </figcaption>
+          </figure>
+        ) : null}
 
         <div className="hero-copy">
           <p className="hero-lead">
