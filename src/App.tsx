@@ -5,6 +5,7 @@ import { Cases } from "./components/Cases";
 import { GlassFx } from "./components/GlassFx";
 import { Hero } from "./components/Hero";
 import { Pipeline } from "./components/Pipeline";
+import { Projects } from "./components/Projects";
 import { StackBelt } from "./components/Belt";
 import { Stats } from "./components/Stats";
 import { Terminal } from "./components/Terminal";
@@ -16,6 +17,7 @@ const navItems = [
   { label: "Resultados", href: "#resultados" },
   { label: "Como funciona", href: "#pipeline" },
   { label: "Cases", href: "#cases" },
+  { label: "Projetos", href: "#projetos" },
   { label: "Stack", href: "#stack" },
   { label: "Trajetória", href: "#trajetoria" },
 ];
@@ -36,6 +38,7 @@ export function App() {
         <Stats />
         <Pipeline />
         <Cases />
+        <Projects />
         <StackBelt />
         <Method />
         <Trajectory />
@@ -140,7 +143,7 @@ function Method() {
       <div className="shell">
         <SectionHeading
           id="metodo-title"
-          index="04"
+          index="05"
           eyebrow="Como eu trabalho"
           title={
             <>
@@ -178,7 +181,7 @@ function Trajectory() {
       <div className="shell">
         <SectionHeading
           id="trajetoria-title"
-          index="05"
+          index="06"
           eyebrow="Trajetória"
           title={
             <>
@@ -232,7 +235,7 @@ function Lab() {
       <div className="shell">
         <SectionHeading
           id="lab-title"
-          index="06"
+          index="07"
           eyebrow="Fora do expediente"
           title={
             <>
@@ -266,7 +269,7 @@ function Contact() {
       <div className="shell contact-grid">
         <div data-reveal>
           <p className="eyebrow">
-            <span className="eyebrow-index">07</span>
+            <span className="eyebrow-index">08</span>
             Vamos conversar
           </p>
           <h2 id="contato-title">Ainda tem alguém digitando placa de caminhão numa planilha?</h2>
