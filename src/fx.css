@@ -37,7 +37,17 @@
   box-shadow: none;
 }
 
-/* --------------------------------- vidro --------------------------------- */
+/* --------------------------------- vidro ---------------------------------
+   Glassmorphism: fundo translúcido + desfoque do que está atrás (backdrop-filter),
+   borda especular, sombra funda e um reflexo que segue o mouse.
+   ------------------------------------------------------------------------- */
+
+/* intensidade do brilho lima na borda: 0% parado, sobe no hover (animável por ser registrada) */
+@property --glow {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 0%;
+}
 
 .fx {
   --glass-fill: linear-gradient(
@@ -48,37 +58,107 @@
     ),
     color-mix(in srgb, var(--bg) 52%, transparent);
   --glass-blur: blur(24px) saturate(180%);
-  --glass-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 0 -1px 0 rgba(255, 255, 255, 0.03),
+  --glass-line: rgba(255, 255, 255, 0.09);
+  --glass-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 -1px 0 rgba(255, 255, 255, 0.03),
     0 30px 80px -32px #000;
   /* borda especular: clara no alto à esquerda, lima embaixo à direita */
   --glass-edge: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.5),
-    rgba(255, 255, 255, 0.06) 28%,
+    rgba(255, 255, 255, 0.42),
+    rgba(255, 255, 255, 0.05) 28%,
     rgba(255, 255, 255, 0) 60%,
-    color-mix(in srgb, var(--accent) 45%, transparent)
+    color-mix(in srgb, var(--accent) 38%, transparent)
   );
 }
 
-.fx .console,
-.fx .term-fab,
-.fx .portrait-tag {
-  border-color: rgba(255, 255, 255, 0.1);
+/* superfícies que viram vidro */
+.fx :is(
+    .console,
+    .portrait-tag,
+    .term-fab,
+    .stat,
+    .pipe-panel,
+    .card,
+    .more-card,
+    .principle,
+    .about-card,
+    .lab-card,
+    .meta-note,
+    .contact-links,
+    .devices li
+  ) {
+  border-color: var(--glass-line);
   background: var(--glass-fill);
   -webkit-backdrop-filter: var(--glass-blur);
   backdrop-filter: var(--glass-blur);
   box-shadow: var(--glass-shadow);
 }
 
-.fx .console::after,
-.fx .term-fab::after,
-.fx .portrait-tag::after {
+/* longhands para não apagar o atraso escalonado do [data-reveal] */
+.fx :is(.stat, .pipe-panel, .more-card, .principle, .about-card, .lab-card, .meta-note, .contact-links, .devices li) {
+  transition-property: opacity, transform, border-color, --glow;
+  transition-duration: 0.7s, 0.55s, 0.3s, 0.45s;
+  transition-timing-function: ease, var(--ease-out), ease, ease;
+}
+
+.fx :is(.stat, .pipe-panel, .more-card, .principle, .lab-card, .meta-note, .contact-links, .devices li) {
+  position: relative;
+}
+
+.fx :is(.console, .stat, .pipe-panel, .more-card, .principle, .about-card, .lab-card, .meta-note, .contact-links) {
+  isolation: isolate;
+}
+
+/* reflexo de luz que segue o mouse (--gx/--gy vêm do GlassFx). Os cards de case já têm o deles. */
+.fx :is(.console, .stat, .pipe-panel, .more-card, .principle, .about-card, .lab-card, .meta-note, .contact-links)::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  content: "";
+  background: radial-gradient(
+    420px circle at var(--gx, 30%) var(--gy, -20%),
+    rgba(255, 255, 255, 0.08),
+    transparent 60%
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.fx .console::before,
+.fx :is(.stat, .pipe-panel, .more-card, .principle, .about-card, .lab-card, .meta-note, .contact-links):hover::before {
+  opacity: 1;
+}
+
+/* borda especular + brilho lima que acompanha o mouse no hover */
+.fx
+  :is(
+    .console,
+    .portrait-tag,
+    .term-fab,
+    .stat,
+    .pipe-panel,
+    .more-card,
+    .principle,
+    .about-card,
+    .lab-card,
+    .meta-note,
+    .contact-links,
+    .devices li
+  )::after {
   position: absolute;
   inset: -1px;
   padding: 1px;
   border-radius: inherit;
   content: "";
-  background: var(--glass-edge);
+  background:
+    radial-gradient(
+      260px circle at var(--gx, 50%) var(--gy, 0%),
+      color-mix(in srgb, var(--accent) var(--glow), transparent),
+      transparent 70%
+    ),
+    var(--glass-edge);
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
@@ -89,33 +169,354 @@
   pointer-events: none;
 }
 
-.fx .term-fab {
+.fx
+  :is(.console, .stat, .pipe-panel, .more-card, .principle, .about-card, .lab-card, .meta-note, .contact-links):hover {
+  --glow: 90%;
+}
+
+/* cards de case: verso também em vidro, mais escuro para o texto ler bem */
+.fx .card-back {
+  background: color-mix(in srgb, var(--surface-2) 78%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  backdrop-filter: blur(18px) saturate(160%);
+}
+
+/* inclinação 3D (o GlassFx aplica o transform; aqui só a suavidade) */
+.fx .is-tilting {
+  transition-delay: 0s;
+  transition-duration: 0.7s, 0.12s, 0.3s, 0.45s;
+}
+
+/* seções com fundo chapado ficam translúcidas para a luz ambiente aparecer atrás do vidro */
+.fx :is(.stats-band, .section.tinted) {
+  background: color-mix(in srgb, var(--surface) 45%, transparent);
+}
+
+.fx .contact {
+  background:
+    radial-gradient(800px 420px at 12% 100%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 70%),
+    color-mix(in srgb, var(--surface) 55%, transparent);
+}
+
+/* números viram blocos de vidro */
+.fx .stats {
+  gap: 14px;
+}
+
+.fx :is(.stat, .stat:first-child, .stat:nth-child(3), .stat:last-child) {
+  padding: 26px 24px 24px;
+  border: 1px solid var(--glass-line);
+  border-radius: var(--radius);
+}
+
+/* contatos: a lista vira um painel de vidro */
+.fx .contact-links {
+  padding: 4px 22px;
+  border: 1px solid var(--glass-line);
+  border-radius: 22px;
+}
+
+.fx .contact-links li:last-child a {
+  border-bottom: 0;
+}
+
+.fx .devices li {
+  border-color: var(--glass-line);
+}
+
+/* ---------------------------- ícones em relevo ----------------------------
+   O ícone ganha uma "pastilha" com luz em cima, sombra embaixo e brilho lima:
+   lê como objeto 3D sem precisar de imagem. */
+
+.fx :is(.principle, .lab-card) > svg {
+  box-sizing: content-box;
+  width: 22px;
+  height: 22px;
+  padding: 13px;
+  border-radius: 15px;
+  color: var(--accent);
+  background:
+    radial-gradient(120% 90% at 28% 8%, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0) 46%),
+    radial-gradient(90% 70% at 72% 100%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 72%),
+    linear-gradient(150deg, #262626, #0b0b0b);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.34),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.55),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 14px 26px -12px #000,
+    0 8px 22px -10px color-mix(in srgb, var(--accent) 45%, transparent);
+  transition: transform 0.5s var(--ease-out);
+}
+
+.fx :is(.principle, .lab-card):hover > svg {
+  transform: translateY(-3px) rotate(-5deg) scale(1.06);
+}
+
+/* ------------------------------ luz ambiente ------------------------------
+   Manchas de luz fixas atrás da página que andam com a rolagem (--p, 0 a 1).
+   É o que o vidro desfoca: sem algo atrás, vidro em fundo preto não aparece. */
+
+.ambient {
+  display: none;
+}
+
+.fx .ambient {
   position: fixed;
-}
-
-/* reflexo que segue o mouse no console (--gx/--gy vêm do Hero) */
-.fx .console {
-  isolation: isolate;
-}
-
-.fx .console::before {
-  position: absolute;
   inset: 0;
   z-index: -1;
-  border-radius: inherit;
-  content: "";
-  background: radial-gradient(
-    420px circle at var(--gx, 30%) var(--gy, -20%),
-    rgba(255, 255, 255, 0.075),
-    transparent 60%
-  );
+  display: block;
+  overflow: hidden;
   pointer-events: none;
 }
 
-.fx .site-header.is-scrolled {
-  border-bottom-color: rgba(255, 255, 255, 0.08);
-  background: var(--glass-fill);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
-  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  will-change: transform;
+}
+
+.orb-a {
+  top: 10%;
+  left: -12%;
+  width: 46vmax;
+  height: 46vmax;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 16%, transparent), transparent 65%);
+  transform: translate3d(calc(var(--p, 0) * 70vw), calc(var(--p, 0) * 30vh), 0);
+}
+
+.orb-b {
+  top: 45%;
+  right: -16%;
+  width: 40vmax;
+  height: 40vmax;
+  background: radial-gradient(circle, rgba(245, 245, 244, 0.07), transparent 65%);
+  transform: translate3d(calc(var(--p, 0) * -55vw), calc(var(--p, 0) * -40vh), 0);
+}
+
+.orb-c {
+  bottom: -20%;
+  left: 30%;
+  width: 34vmax;
+  height: 34vmax;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 10%, transparent), transparent 65%);
+  transform: translate3d(calc(var(--p, 0) * 25vw), calc(var(--p, 0) * -60vh), 0);
+}
+
+/* ---------------------------- botões flutuantes ----------------------------
+   Valem com ou sem .fx: WhatsApp à esquerda, terminal à direita. */
+
+@property --spin {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.fab-dock {
+  position: fixed;
+  bottom: 20px;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fab-dock-right {
+  right: 20px;
+  align-items: flex-end;
+}
+
+.fab-dock-left {
+  left: 20px;
+  align-items: flex-start;
+}
+
+.fab-dock .term-fab {
+  position: relative;
+  right: auto;
+  bottom: auto;
+  height: 46px;
+  padding: 0 18px;
+  box-shadow:
+    0 0 28px -8px color-mix(in srgb, var(--accent) 55%, transparent),
+    0 12px 30px -12px #000;
+}
+
+/* anel lima girando em volta do botão do terminal: chama o olho sem piscar */
+.fab-dock .term-fab::before {
+  position: absolute;
+  inset: -2px;
+  padding: 1.5px;
+  border-radius: inherit;
+  content: "";
+  background: conic-gradient(from var(--spin), transparent 0 60%, var(--accent) 82%, transparent 96%);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  animation: fab-spin 3.6s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes fab-spin {
+  to {
+    --spin: 360deg;
+  }
+}
+
+.term-hint {
+  position: relative;
+  max-width: 250px;
+  margin: 0;
+  padding: 12px 15px;
+  border: 1px solid var(--accent-30);
+  border-radius: 14px 14px 4px 14px;
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(170%);
+  backdrop-filter: blur(18px) saturate(170%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 20px 50px -20px #000;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  line-height: 1.5;
+  opacity: 0;
+  transform: translateY(10px) scale(0.95);
+  transform-origin: bottom right;
+  visibility: hidden;
+  transition:
+    opacity 0.35s ease,
+    transform 0.5s var(--ease-out),
+    visibility 0s 0.5s;
+  cursor: pointer;
+}
+
+.term-hint.is-shown {
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+  transition:
+    opacity 0.35s ease,
+    transform 0.5s var(--ease-out);
+}
+
+.term-hint b {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.term-hint span {
+  display: block;
+  margin-top: 2px;
+  color: var(--soft);
+}
+
+.wa-fab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 48px;
+  padding: 0 18px 0 6px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #3ae07f, #22c35e 55%, #19a94f);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -2px 5px rgba(0, 0, 0, 0.22),
+    0 14px 30px -12px rgba(37, 211, 102, 0.7),
+    0 6px 14px -6px #000;
+  color: #04220f;
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.25s var(--ease);
+}
+
+/* pulso suave em volta: avisa que é clicável sem gritar */
+.wa-fab::before {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  content: "";
+  animation: wa-pulse 2.8s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes wa-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.45);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 14px rgba(37, 211, 102, 0);
+  }
+}
+
+.wa-fab:hover {
+  transform: translateY(-2px);
+}
+
+.wa-fab:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 3px;
+}
+
+.wa-fab-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #128c4a, #0b6b37);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 2px 6px -2px rgba(0, 0, 0, 0.5);
+}
+
+.wa-fab-icon svg {
+  width: 20px;
+  height: 20px;
+  fill: #fff;
+}
+
+@media (max-width: 640px) {
+  .fab-dock {
+    bottom: 14px;
+  }
+
+  .fab-dock-right {
+    right: 14px;
+  }
+
+  .fab-dock-left {
+    left: 14px;
+  }
+
+  .wa-fab {
+    padding: 0 6px;
+    height: 48px;
+  }
+
+  .wa-fab-label {
+    display: none;
+  }
+
+  .fx :is(.stat, .stat:first-child, .stat:nth-child(3), .stat:last-child) {
+    padding: 22px 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fab-dock .term-fab::before,
+  .wa-fab::before {
+    animation: none;
+  }
+
+  .orb {
+    transform: none;
+  }
 }

@@ -2,11 +2,13 @@ import { useEffect, useState, type ReactNode } from "react";
 import { ArrowRight, ArrowUpRight, Download, Menu, MessageCircle, X } from "lucide-react";
 import { Boot } from "./components/Boot";
 import { Cases } from "./components/Cases";
+import { GlassFx } from "./components/GlassFx";
 import { Hero } from "./components/Hero";
 import { Pipeline } from "./components/Pipeline";
 import { StackBelt } from "./components/Belt";
 import { Stats } from "./components/Stats";
 import { Terminal } from "./components/Terminal";
+import { WhatsAppFab } from "./components/WhatsAppFab";
 import { education, lab, principles, profile, socialLinks, timeline, whatsAppLink } from "./data/portfolio";
 import { useReveal } from "./hooks";
 
@@ -24,6 +26,7 @@ export function App() {
   return (
     <>
       <Boot />
+      <GlassFx />
       <a className="skip-link" href="#conteudo">
         Pular para o conteúdo
       </a>
@@ -40,6 +43,7 @@ export function App() {
         <Contact />
       </main>
       <Footer />
+      <WhatsAppFab />
       <Terminal />
     </>
   );

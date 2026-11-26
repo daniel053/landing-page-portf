@@ -21,6 +21,33 @@ export function Terminal() {
   const historyIndex = useRef(0);
   const seq = useRef(0);
   const andonTimer = useRef(0);
+  const [hint, setHint] = useState(false);
+
+  /* Dica única: depois de alguns segundos o botão avisa que existe um terminal. Some sozinha e não volta. */
+  useEffect(() => {
+    let seen = false;
+    try {
+      seen = localStorage.getItem("term-hint") === "1";
+    } catch {
+      /* armazenamento bloqueado: mostra a dica mesmo assim */
+    }
+    if (seen) return;
+    const show = window.setTimeout(() => setHint(true), 6500);
+    const hide = window.setTimeout(() => setHint(false), 6500 + 9000);
+    return () => {
+      window.clearTimeout(show);
+      window.clearTimeout(hide);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!hint) return;
+    try {
+      localStorage.setItem("term-hint", "1");
+    } catch {
+      /* ok */
+    }
+  }, [hint]);
 
   const triggerAndon = useCallback(() => {
     setAndon(true);
@@ -36,6 +63,7 @@ export function Terminal() {
 
   const openTerminal = useCallback(() => {
     lastFocus.current = document.activeElement;
+    setHint(false);
     setOpen(true);
   }, []);
 
@@ -152,9 +180,17 @@ export function Terminal() {
         <div className="andon-banner">⚠ Chamado Andon · linha 3 · manutenção a caminho</div>
       </div>
 
-      <button className="term-fab" type="button" onClick={openTerminal} aria-label="Abrir terminal (atalho: barra)">
-        <span aria-hidden="true">&gt;_</span> terminal <kbd aria-hidden="true">/</kbd>
-      </button>
+      <div className="fab-dock fab-dock-right">
+        <p className={`term-hint${hint ? " is-shown" : ""}`} aria-hidden={!hint} onClick={() => setHint(false)}>
+          psst… tem um <b>terminal</b> escondido aqui.
+          <span>
+            clique ou aperte <kbd>/</kbd>
+          </span>
+        </p>
+        <button className="term-fab" type="button" onClick={openTerminal} aria-label="Abrir terminal (atalho: barra)">
+          <span aria-hidden="true">&gt;_</span> terminal <kbd aria-hidden="true">/</kbd>
+        </button>
+      </div>
 
       {open ? (
         <div
