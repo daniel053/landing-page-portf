@@ -1,18 +1,24 @@
 import {
   Bot,
   Box,
+  BrainCircuit,
   Cctv,
   Compass,
+  Database,
   Factory,
   Gamepad2,
   Gauge,
+  Handshake,
+  Layers,
   Github,
   Linkedin,
   Mail,
   MessageCircle,
+  Nfc,
   Printer,
   Radio,
   Scale,
+  ScanEye,
   ShieldCheck,
   Siren,
   Smartphone,
@@ -308,7 +314,8 @@ export const sideProjects: SideProject[] = [
 
 /* ------------------------------ Esteira (stack) ------------------------------ */
 
-export type BeltItem = { id: string; name: string; cat: string };
+/** `icon` só para o que não tem logo oficial; as marcas saem de brandIcons.ts pelo `id`. */
+export type BeltItem = { id: string; name: string; cat: string; icon?: LucideIcon };
 
 export const beltRows: BeltItem[][] = [
   [
@@ -316,26 +323,29 @@ export const beltRows: BeltItem[][] = [
     { id: "net8", name: ".NET 8", cat: "Back-end" },
     { id: "aspnet", name: "ASP.NET Core", cat: "Back-end" },
     { id: "blazor", name: "Blazor", cat: "Full stack" },
-    { id: "efcore", name: "EF Core", cat: "Dados" },
-    { id: "abp", name: "ABP", cat: "Framework" },
+    { id: "efcore", name: "EF Core", cat: "Dados", icon: Database },
+    { id: "abp", name: "ABP", cat: "Framework", icon: Layers },
     { id: "react", name: "React", cat: "Front-end" },
     { id: "ts", name: "TypeScript", cat: "Front-end" },
-    { id: "angular", name: "Angular", cat: "Front-end" },
     { id: "figma", name: "Figma", cat: "UX/UI" },
-    { id: "4gl", name: "4GL TOTVS", cat: "ERP" },
+    { id: "4gl", name: "4GL TOTVS", cat: "ERP", icon: Factory },
+    { id: "ia", name: "IA", cat: "Produtividade", icon: BrainCircuit },
+    { id: "team", name: "Trabalho em equipe", cat: "Pessoas", icon: Handshake },
   ],
   [
     { id: "pg", name: "PostgreSQL", cat: "Dados" },
     { id: "sqlserver", name: "SQL Server", cat: "Dados" },
     { id: "oracle", name: "Oracle", cat: "Dados" },
     { id: "redis", name: "Redis", cat: "Cache" },
+    { id: "rabbitmq", name: "RabbitMQ", cat: "Mensageria" },
     { id: "docker", name: "Docker", cat: "Infra" },
+    { id: "k8s", name: "Kubernetes", cat: "Infra" },
     { id: "aws", name: "AWS", cat: "Nuvem" },
     { id: "linux", name: "Linux", cat: "Infra" },
     { id: "python", name: "Python", cat: "Visão" },
-    { id: "yolo", name: "YOLOv8", cat: "Visão" },
-    { id: "rfid", name: "RFID UHF", cat: "Hardware" },
-    { id: "zpl", name: "Zebra ZPL", cat: "Hardware" },
+    { id: "yolo", name: "YOLOv8", cat: "Visão", icon: ScanEye },
+    { id: "rfid", name: "RFID UHF", cat: "Hardware", icon: Nfc },
+    { id: "zpl", name: "Zebra ZPL", cat: "Hardware", icon: Printer },
   ],
 ];
 

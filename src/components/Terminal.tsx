@@ -55,7 +55,7 @@ export function Terminal() {
       cases
         .map((item, index) => `${String(index + 1).padStart(2, "0")}  ${escapeHtml(item.title)}  ${acc(`[${escapeHtml(item.metric.value)}]`)}`)
         .join("\n"),
-    stack: () => "C# · .NET 8 · Blazor · React · TypeScript · PostgreSQL · Oracle\nDocker · AWS · Python · YOLOv8 · RFID UHF · Zebra ZPL · 4GL",
+    stack: () => "C# · .NET 8 · Blazor · React · TypeScript · PostgreSQL · Oracle · RabbitMQ\nDocker · Kubernetes · AWS · Python · YOLOv8 · IA · RFID UHF · Zebra ZPL · 4GL\ntrabalho em equipe, sempre",
     contato: () =>
       socialLinks.map((item) => `${item.label.toLowerCase().padEnd(10)} ${link(item.href, item.handle)}`).join("\n"),
     ls: () => `cases/  stack/  contato/  ${acc("segredos.txt")}`,

@@ -1,5 +1,6 @@
 import { useMemo, useState, type PointerEvent } from "react";
 import { beltRows, type BeltItem } from "../data/portfolio";
+import { brandIcons } from "../data/brandIcons";
 
 const total = beltRows.reduce((sum, row) => sum + row.length, 0);
 
@@ -33,6 +34,23 @@ function barcodeRects(text: string) {
   return rects;
 }
 
+/** Logo oficial (Devicon) quando existe; senão o ícone Lucide do item. */
+function LabelIcon({ item }: { item: BeltItem }) {
+  const brand = brandIcons[item.id];
+  if (brand) {
+    return (
+      <svg
+        className="label-icon"
+        viewBox={brand.viewBox}
+        aria-hidden="true"
+        dangerouslySetInnerHTML={{ __html: brand.body }}
+      />
+    );
+  }
+  const Icon = item.icon;
+  return Icon ? <Icon className="label-icon is-lucide" aria-hidden="true" strokeWidth={2.2} /> : null;
+}
+
 function Label({ item, number, state }: { item: BeltItem; number: number; state: "idle" | "scanning" | "read" }) {
   const rects = useMemo(() => barcodeRects(item.id), [item.id]);
   return (
@@ -41,7 +59,10 @@ function Label({ item, number, state }: { item: BeltItem; number: number; state:
         <span>TX-{String(number).padStart(4, "0")}</span>
         <span>{item.cat}</span>
       </div>
-      <div className="label-name">{item.name}</div>
+      <div className="label-name">
+        <LabelIcon item={item} />
+        {item.name}
+      </div>
       <svg viewBox="0 0 150 30" preserveAspectRatio="none" aria-hidden="true">
         {rects.map((rect) => (
           <rect key={rect.x} x={rect.x} width={rect.w} height="30" />
