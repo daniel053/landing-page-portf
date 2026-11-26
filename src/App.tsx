@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { ArrowRight, ArrowUpRight, Download, Menu, MessageCircle, X } from "lucide-react";
+import { Artifacts } from "./components/Artifacts";
 import { Boot } from "./components/Boot";
 import { Cases } from "./components/Cases";
 import { GlassFx } from "./components/GlassFx";
@@ -14,10 +15,10 @@ import { education, lab, principles, profile, socialLinks, timeline, whatsAppLin
 import { useReveal } from "./hooks";
 
 const navItems = [
-  { label: "Resultados", href: "#resultados" },
   { label: "Como funciona", href: "#pipeline" },
   { label: "Cases", href: "#cases" },
   { label: "Projetos", href: "#projetos" },
+  { label: "Em produção", href: "#em-producao" },
   { label: "Stack", href: "#stack" },
   { label: "Trajetória", href: "#trajetoria" },
 ];
@@ -39,8 +40,9 @@ export function App() {
         <Pipeline />
         <Cases />
         <Projects />
-        <StackBelt />
+        <Artifacts />
         <Method />
+        <StackBelt />
         <Trajectory />
         <Lab />
         <Contact />
@@ -181,7 +183,7 @@ function Trajectory() {
       <div className="shell">
         <SectionHeading
           id="trajetoria-title"
-          index="06"
+          index="07"
           eyebrow="Trajetória"
           title={
             <>
@@ -235,7 +237,7 @@ function Lab() {
       <div className="shell">
         <SectionHeading
           id="lab-title"
-          index="07"
+          index="08"
           eyebrow="Fora do expediente"
           title={
             <>
@@ -269,7 +271,7 @@ function Contact() {
       <div className="shell contact-grid">
         <div data-reveal>
           <p className="eyebrow">
-            <span className="eyebrow-index">08</span>
+            <span className="eyebrow-index">09</span>
             Vamos conversar
           </p>
           <h2 id="contato-title">Ainda tem alguém digitando placa de caminhão numa planilha?</h2>

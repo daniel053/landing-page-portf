@@ -1,0 +1,514 @@
+/* ------------------------------ Em produção ------------------------------ */
+/* Cards pequenos com capturas reais. Cada tela "passeia" devagar dentro de um
+   mini navegador; no hover a câmera para e dá zoom no ponto que importa. */
+
+.shot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 258px), 1fr));
+  gap: 16px;
+}
+
+.more-card.shot-card {
+  padding: 12px 12px 18px;
+  border-radius: 18px;
+}
+
+/* ---------- moldura ---------- */
+
+.shot {
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  border-radius: 11px;
+  background: #050505;
+}
+
+.shot-bar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 0 9px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+  font-family: var(--mono);
+  font-size: 0.62rem;
+}
+
+.shot-bar i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--line-strong);
+}
+
+.shot-path {
+  overflow: hidden;
+  margin-left: 6px;
+  color: var(--soft);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.shot-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.shot-live::before {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  content: "";
+  background: var(--accent);
+  box-shadow: 0 0 0 0 var(--accent-30);
+  animation: shot-pulse 2.4s ease-out infinite;
+}
+
+.shot-view {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+
+.shot-view:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* câmera lenta: deriva de um canto ao outro, para no hover */
+.shot-pan {
+  position: absolute;
+  inset: 0;
+  transform: scale(1.12) translate(3%, 2%);
+  animation: shot-drift 16s ease-in-out infinite alternate;
+}
+
+.shot-card:nth-child(2) .shot-pan {
+  animation-delay: -5s;
+}
+
+.shot-card:nth-child(3) .shot-pan {
+  animation-delay: -10s;
+}
+
+.shot-view img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 0;
+  opacity: 0;
+  transform-origin: var(--fx, 50%) var(--fy, 30%);
+  filter: saturate(0.85) brightness(0.92);
+  transition:
+    opacity 0.7s ease,
+    transform 0.9s var(--ease-out),
+    filter 0.4s ease;
+}
+
+.shot-view img.is-on {
+  opacity: 1;
+}
+
+.shot-view:is(:hover, :focus-visible) .shot-pan {
+  animation-play-state: paused;
+}
+
+.shot-view:is(:hover, :focus-visible) img {
+  filter: none;
+  transform: scale(1.9);
+}
+
+/* leitura: uma linha lima varre a tela ao aparecer e de novo no hover */
+.shot-scan {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent 0,
+    color-mix(in srgb, var(--accent) 10%, transparent) 84%,
+    var(--accent) 86%,
+    transparent 87%
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 60%;
+  background-position: 0 -200%;
+  mix-blend-mode: screen;
+}
+
+.shot-card.is-in .shot-scan {
+  animation: shot-scan 1.6s 0.25s var(--ease) both;
+}
+
+.shot-card.is-in .shot-view:hover .shot-scan {
+  animation: shot-scan-again 1.2s var(--ease) both;
+}
+
+.shot-zoom {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg) 78%, transparent);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s var(--ease);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.shot-view:is(:hover, :focus-visible) .shot-zoom {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- abas (projeto com mais de uma tela) ---------- */
+
+.shot-tabs {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.shot-tabs button {
+  position: relative;
+  flex: 1;
+  padding: 5px 0 8px;
+  overflow: hidden;
+  border: 0;
+  background: none;
+  color: var(--dim);
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.06em;
+  text-align: left;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.shot-tabs button::before,
+.shot-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  border-radius: 2px;
+}
+
+.shot-tabs button::before {
+  content: "";
+  background: var(--line-strong);
+}
+
+.shot-fill {
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.shot-tabs button:hover,
+.shot-tabs .is-on {
+  color: var(--text);
+}
+
+.shot-tabs .is-on .shot-fill {
+  animation: shot-fill 5.5s linear both;
+}
+
+.shot-card:not(.is-in) .shot-fill,
+.shot-card:hover .shot-fill {
+  animation-play-state: paused;
+}
+
+/* ---------- texto ---------- */
+
+.more-card.shot-card .shot-kicker,
+.shot-slot .shot-kicker {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 14px 6px 0;
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.shot-card h3 {
+  margin: 6px 6px 6px;
+  font-size: 1.08rem;
+  font-weight: 760;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.more-card.shot-card .shot-body,
+.shot-slot .shot-body {
+  margin: 0 6px;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+.more-card.shot-card .shot-users {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin: 12px 6px 0;
+  color: var(--soft);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.shot-users svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--accent);
+}
+
+.shot-users b {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.more-card.shot-card .chips {
+  padding: 14px 6px 0;
+}
+
+/* ---------- vaga reservada ---------- */
+
+.shot-slot {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 12px 18px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 18px;
+}
+
+.shot-slot-frame {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 10;
+  margin-top: 25px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 11px;
+  color: var(--dim);
+  background:
+    repeating-linear-gradient(-45deg, transparent 0 10px, rgba(245, 245, 244, 0.025) 10px 20px);
+}
+
+.shot-slot .shot-kicker {
+  color: var(--soft);
+}
+
+/* ---------- ampliado ---------- */
+
+.shot-dialog {
+  width: min(1280px, 100vw - 32px);
+  max-width: none;
+  max-height: calc(100dvh - 32px);
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  background: none;
+  color: var(--text);
+}
+
+.shot-dialog::backdrop {
+  background: rgba(5, 5, 5, 0.82);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.shot-dialog[open] {
+  animation: shot-in 0.35s var(--ease-out) both;
+}
+
+.shot-dialog figure {
+  position: relative;
+  margin: 0;
+}
+
+.shot-dialog img {
+  width: 100%;
+  max-height: calc(100dvh - 110px);
+  object-fit: contain;
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  background: #050505;
+}
+
+.shot-dialog figcaption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 18px;
+  margin-top: 12px;
+  font-size: 0.92rem;
+}
+
+.shot-dialog-note {
+  color: var(--soft);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+}
+
+.shot-dialog-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+}
+
+.shot-dialog-nav button,
+.shot-dialog-close {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  background: var(--surface-2);
+  color: var(--text);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.shot-dialog-nav button:hover,
+.shot-dialog-close:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.shot-dialog-close {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  width: 38px;
+  height: 38px;
+}
+
+/* ---------- keyframes ---------- */
+
+@keyframes shot-drift {
+  to {
+    transform: scale(1.12) translate(-3%, -2%);
+  }
+}
+
+@keyframes shot-scan {
+  from {
+    background-position: 0 -200%;
+  }
+  to {
+    background-position: 0 300%;
+  }
+}
+
+@keyframes shot-scan-again {
+  from {
+    background-position: 0 -200%;
+  }
+  to {
+    background-position: 0 300%;
+  }
+}
+
+@keyframes shot-fill {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes shot-pulse {
+  70%,
+  100% {
+    box-shadow: 0 0 0 6px transparent;
+  }
+}
+
+@keyframes shot-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+}
+
+/* no celular os cards viram uma fileira que desliza, para não ocupar a tela toda */
+@media (max-width: 640px) {
+  .shot-grid {
+    grid-template-columns: none;
+    grid-auto-columns: 82%;
+    grid-auto-flow: column;
+    gap: 12px;
+    margin-inline: calc(var(--gutter) * -1);
+    padding: 4px var(--gutter) 12px;
+    overflow-x: auto;
+    scroll-padding-inline: var(--gutter);
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .shot-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .shot-grid > li {
+    scroll-snap-align: start;
+  }
+
+  .shot-dialog-close {
+    top: -46px;
+    right: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shot-pan,
+  .shot-scan,
+  .shot-live::before {
+    animation: none !important;
+  }
+
+  .shot-tabs .is-on .shot-fill {
+    animation: none;
+    transform: scaleX(1);
+  }
+
+  .shot-view img {
+    transition: opacity 0.2s ease;
+  }
+
+  .shot-view:is(:hover, :focus-visible) img {
+    transform: none;
+  }
+}
