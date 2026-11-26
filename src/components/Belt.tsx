@@ -106,7 +106,7 @@ export function StackBelt() {
       <div className="shell belt-head">
         <div className="section-heading" data-reveal>
           <p className="eyebrow">
-            <span className="eyebrow-index">06</span>
+            <span className="eyebrow-index">07</span>
             Stack
           </p>
           <h2 id="stack-title">

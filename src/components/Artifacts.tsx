@@ -156,7 +156,7 @@ export function Artifacts() {
       <div className="shell">
         <header className="section-heading" data-reveal>
           <p className="eyebrow">
-            <span className="eyebrow-index">04</span>
+            <span className="eyebrow-index">05</span>
             Em produção
           </p>
           <h2 id="em-producao-title">

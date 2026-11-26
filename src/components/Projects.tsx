@@ -199,7 +199,7 @@ export function Projects() {
       <div className="shell">
         <header className="section-heading" data-reveal>
           <p className="eyebrow">
-            <span className="eyebrow-index">03</span>
+            <span className="eyebrow-index">04</span>
             Projetos
           </p>
           <h2 id="projetos-title">

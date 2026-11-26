@@ -1,0 +1,727 @@
+/* ==========================================================================
+   Projetos com IA: PapeAI (projeto pessoal). Palco 3D interativo + texto.
+   Como nas maquetes, as cores de brinquedo ficam só dentro do palco;
+   fora dele a página segue preto/branco/lima.
+   ========================================================================== */
+
+.papeai {
+  position: relative;
+  overflow: clip;
+}
+
+/* um brilho lima discreto atrás do palco, para a seção ter destaque próprio */
+.papeai::before {
+  content: "";
+  position: absolute;
+  top: 18%;
+  left: -10%;
+  width: 70%;
+  height: 70%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 9%, transparent), transparent);
+  pointer-events: none;
+}
+
+.pape {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+  gap: clamp(28px, 4.5vw, 64px);
+  align-items: start;
+}
+
+/* --------------------------------- palco --------------------------------- */
+
+.pape-demo {
+  position: sticky;
+  top: calc(var(--header-h) + 20px);
+}
+
+.pape-stage {
+  position: relative;
+  aspect-ratio: 1 / 1.02;
+  max-height: calc(100svh - var(--header-h) - 190px);
+  min-height: 380px;
+  width: 100%;
+  border: 1px solid var(--line-strong);
+  border-radius: 28px;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(80% 65% at 50% 38%, #1d2a55 0%, transparent 70%),
+    radial-gradient(60% 45% at 50% 100%, rgba(198, 244, 50, 0.16), transparent 70%),
+    radial-gradient(50% 50% at 0% 0%, rgba(255, 155, 210, 0.1), transparent 70%),
+    #0b0e18;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 40px 90px -40px #000;
+}
+
+.pape-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1.4px);
+  background-size: 22px 22px;
+  mask-image: radial-gradient(80% 70% at 50% 45%, #000, transparent);
+}
+
+.pape-stage canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transform: translateY(18px) scale(0.96);
+  transition:
+    opacity 1s var(--ease-out),
+    transform 1.3s var(--ease-out);
+}
+
+.pape-stage.is-on canvas {
+  opacity: 1;
+  transform: none;
+}
+
+.pape-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.pape-anchor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+}
+
+/* o balão fica por cima das etiquetas */
+.pape-anchor[data-anchor="head"] {
+  z-index: 2;
+}
+
+/* sem 3D: o balão fica parado no meio do palco */
+.pape-stage:not(.is-on) .pape-anchor[data-anchor="head"] {
+  left: 50%;
+  top: 45%;
+}
+
+.pape-stage:not(.is-on) .pape-anchor:not([data-anchor="head"]) {
+  display: none;
+}
+
+/* balão de fala do sagui: nasce da cabeça, para cima e para a esquerda */
+.pape-bubble {
+  position: absolute;
+  left: 0;
+  bottom: 14px;
+  width: max-content;
+  max-width: min(280px, 60vw);
+  padding: 11px 14px 12px;
+  border-radius: 18px;
+  translate: -50% 0;
+  background: #f5f5f4;
+  color: #0a0a0a;
+  box-shadow: 0 18px 40px -16px rgba(0, 0, 0, 0.8);
+  animation: bubble-in 0.45s var(--ease-out);
+  transform-origin: 50% 100%;
+}
+
+.pape-bubble p {
+  font-size: 0.95rem;
+  font-weight: 620;
+  line-height: 1.38;
+}
+
+.pape-bubble small {
+  display: block;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed rgba(10, 10, 10, 0.18);
+  color: #3b4a12;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.02em;
+  animation: bubble-in 0.4s var(--ease-out);
+}
+
+.pape-bubble.is-typing {
+  padding: 13px 16px;
+}
+
+@keyframes bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.85);
+  }
+}
+
+.pape-dots {
+  display: flex;
+  gap: 5px;
+}
+
+.pape-dots i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #0a0a0a;
+  animation: dots 1s ease-in-out infinite;
+}
+
+.pape-dots i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.pape-dots i:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes dots {
+  50% {
+    opacity: 0.25;
+    transform: translateY(-3px);
+  }
+}
+
+.pape-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 2px;
+  vertical-align: -0.12em;
+  background: #0a0a0a;
+  animation: caret 0.8s steps(1) infinite;
+}
+
+@keyframes caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+.pape-tag {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 10px 30px -8px color-mix(in srgb, var(--accent) 60%, transparent);
+  opacity: 0;
+  transform: translate(-50%, 6px) scale(0.85);
+  transition:
+    opacity 0.35s ease,
+    transform 0.45s var(--ease-out);
+}
+
+.pape-tag.is-on {
+  opacity: 1;
+  transform: translateX(-50%);
+}
+
+.pape-tag.is-lock {
+  bottom: 4px;
+  border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent);
+  background: rgba(10, 14, 6, 0.8);
+  color: var(--accent);
+  backdrop-filter: blur(8px);
+}
+
+.pape-tag.is-lock::before {
+  content: "🔒";
+  font-size: 0.7rem;
+}
+
+/* o que "você" disse */
+.pape-you {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  max-width: 62%;
+  padding: 9px 13px 10px;
+  border-radius: 16px 16px 4px 16px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 0.88rem;
+  font-weight: 650;
+  line-height: 1.35;
+  box-shadow: 0 16px 36px -14px rgba(0, 0, 0, 0.8);
+  animation: bubble-in 0.4s var(--ease-out);
+}
+
+.pape-you span {
+  display: block;
+  margin-bottom: 2px;
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  opacity: 0.6;
+  text-transform: uppercase;
+}
+
+.pape-wait {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  color: var(--soft);
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+.pape-stage.is-wait .pape-wait {
+  animation: wait-pulse 1.4s ease-in-out infinite;
+}
+
+.pape-hint {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--dim);
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ----------------------------- respostas ----------------------------- */
+
+.pape-chat {
+  margin-top: 14px;
+  min-height: 72px;
+}
+
+.pape-connect {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 18px;
+  border: 1px solid var(--accent);
+  border-radius: 18px;
+  background: var(--accent-12, rgba(198, 244, 50, 0.12));
+  color: var(--text);
+  text-align: left;
+  transition:
+    background-color 0.25s ease,
+    transform 0.25s var(--ease-out);
+}
+
+.pape-connect > svg:first-child {
+  flex: none;
+  color: var(--accent);
+}
+
+.pape-connect span {
+  display: grid;
+  flex: 1;
+  line-height: 1.25;
+}
+
+.pape-connect b {
+  font-size: 1rem;
+  font-weight: 720;
+}
+
+.pape-connect small {
+  color: var(--soft);
+  font-family: var(--mono);
+  font-size: 0.66rem;
+}
+
+.pape-connect:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+  transform: translateY(-2px);
+}
+
+.pape-connect:disabled {
+  opacity: 0.6;
+}
+
+.pape-chat-label {
+  margin-bottom: 8px;
+  color: var(--soft);
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pape-replies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pape-replies button {
+  padding: 9px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  font-size: 0.86rem;
+  transition:
+    border-color 0.25s ease,
+    background-color 0.25s ease,
+    transform 0.25s var(--ease-out),
+    opacity 0.25s ease;
+  animation: bubble-in 0.4s var(--ease-out) both;
+}
+
+.pape-replies li:nth-child(2) button {
+  animation-delay: 0.06s;
+}
+
+.pape-replies li:nth-child(3) button {
+  animation-delay: 0.12s;
+}
+
+.pape-replies li:nth-child(4) button {
+  animation-delay: 0.18s;
+}
+
+.pape-replies button:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: var(--accent-12, rgba(198, 244, 50, 0.12));
+  transform: translateY(-2px);
+}
+
+.pape-replies button.is-used {
+  color: var(--soft);
+}
+
+.pape-replies button:disabled {
+  opacity: 0.45;
+  cursor: progress;
+}
+
+/* -------------------------------- texto -------------------------------- */
+
+.pape-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px 6px 10px;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  border-radius: 999px;
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pape-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pape-ping 1.8s ease-out infinite;
+}
+
+@keyframes pape-ping {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 60%, transparent);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 9px transparent;
+  }
+}
+
+.pape-name {
+  margin-top: 18px;
+  font-family: var(--display);
+  font-size: clamp(2.6rem, 4vw + 0.8rem, 4.2rem);
+  font-weight: 820;
+  font-stretch: 108%;
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+}
+
+.pape-name span {
+  color: var(--accent);
+}
+
+.pape-lead {
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 1.04rem;
+  line-height: 1.65;
+}
+
+.pape-byok {
+  position: relative;
+  margin-top: 26px;
+  padding: 20px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: 20px;
+  background:
+    radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 60%),
+    rgba(255, 255, 255, 0.02);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.pape-byok-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 1.12rem;
+  font-weight: 750;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.pape-byok-title svg {
+  flex: none;
+  margin-top: 3px;
+  color: var(--accent);
+}
+
+.pape-byok-body {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 0.94rem;
+  line-height: 1.6;
+}
+
+/* rota da chave: celular → provedor; o servidor do app fica de fora */
+.pape-route {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px 10px;
+  margin-top: 16px;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+}
+
+.pape-node {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+.pape-node.is-on {
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 700;
+}
+
+.pape-node.is-off {
+  grid-column: 1 / -1;
+  justify-self: center;
+  border: 1px dashed var(--line-strong);
+  color: var(--dim);
+  text-decoration: line-through;
+}
+
+.pape-node.is-off svg:last-child {
+  color: #ff5d73;
+}
+
+.pape-wire {
+  position: relative;
+  height: 2px;
+  background: color-mix(in srgb, var(--accent) 35%, transparent);
+  overflow: hidden;
+}
+
+.pape-wire::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 30%;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+  animation: wire 1.6s var(--ease) infinite;
+}
+
+@keyframes wire {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(340%);
+  }
+}
+
+.pape-pillars {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.pape-pillars li {
+  display: grid;
+  gap: 2px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.pape-pillars svg {
+  margin-bottom: 6px;
+  color: var(--accent);
+}
+
+.pape-pillars b {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.pape-pillars span {
+  color: var(--soft);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.pape-quote {
+  margin-top: 24px;
+  padding-left: 18px;
+  border-left: 2px solid var(--accent);
+}
+
+.pape-quote p {
+  font-size: 1.06rem;
+  font-style: italic;
+  line-height: 1.55;
+}
+
+.pape-quote footer {
+  margin-top: 8px;
+  color: var(--soft);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+}
+
+.pape-phase {
+  margin: 24px 0 16px;
+}
+
+.pape-phase ol {
+  display: grid;
+  grid-template-columns: repeat(13, 1fr);
+  gap: 4px;
+}
+
+.pape-phase li {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--line-strong);
+}
+
+.pape-phase li.is-now {
+  background: var(--accent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 70%, transparent);
+  animation: wait-pulse 1.6s ease-in-out infinite;
+}
+
+.pape-phase p {
+  margin-top: 10px;
+  color: var(--soft);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+}
+
+.pape-phase b {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* vidro, como o resto do site com .fx */
+.fx :is(.pape-pillars li, .pape-byok) {
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+}
+
+.fx .pape-pillars li {
+  border-color: var(--glass-line);
+  background: var(--glass-fill);
+  box-shadow: var(--glass-shadow);
+}
+
+/* ------------------------------ responsivo ------------------------------ */
+
+@media (max-width: 960px) {
+  .pape {
+    grid-template-columns: 1fr;
+  }
+
+  .pape-demo {
+    position: relative;
+    top: auto;
+  }
+
+  .pape-stage {
+    max-height: none;
+    aspect-ratio: 1 / 1.05;
+  }
+}
+
+@media (max-width: 560px) {
+  .pape-stage {
+    min-height: 0;
+    aspect-ratio: 1 / 1.08;
+    border-radius: 20px;
+  }
+
+  .pape-bubble {
+    max-width: 62vw;
+    padding: 9px 12px 10px;
+  }
+
+  .pape-bubble p {
+    font-size: 0.84rem;
+  }
+
+  .pape-you {
+    right: 10px;
+    bottom: 10px;
+    font-size: 0.78rem;
+  }
+
+  .pape-replies button {
+    font-size: 0.8rem;
+  }
+
+  .pape-pillars {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pape-bubble,
+  .pape-bubble small,
+  .pape-you,
+  .pape-replies button,
+  .pape-dot,
+  .pape-wire::after,
+  .pape-phase li.is-now,
+  .pape-dots i {
+    animation: none;
+  }
+}

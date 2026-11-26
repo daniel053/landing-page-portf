@@ -5,6 +5,7 @@ import { Boot } from "./components/Boot";
 import { Cases } from "./components/Cases";
 import { GlassFx } from "./components/GlassFx";
 import { Hero } from "./components/Hero";
+import { PapeAI } from "./components/PapeAI";
 import { Pipeline } from "./components/Pipeline";
 import { Projects } from "./components/Projects";
 import { StackBelt } from "./components/Belt";
@@ -17,6 +18,7 @@ import { useReveal } from "./hooks";
 const navItems = [
   { label: "Como funciona", href: "#pipeline" },
   { label: "Cases", href: "#cases" },
+  { label: "IA", href: "#ia" },
   { label: "Projetos", href: "#projetos" },
   { label: "Em produção", href: "#em-producao" },
   { label: "Stack", href: "#stack" },
@@ -39,6 +41,7 @@ export function App() {
         <Stats />
         <Pipeline />
         <Cases />
+        <PapeAI />
         <Projects />
         <Artifacts />
         <Method />
@@ -145,7 +148,7 @@ function Method() {
       <div className="shell">
         <SectionHeading
           id="metodo-title"
-          index="05"
+          index="06"
           eyebrow="Como eu trabalho"
           title={
             <>
@@ -183,7 +186,7 @@ function Trajectory() {
       <div className="shell">
         <SectionHeading
           id="trajetoria-title"
-          index="07"
+          index="08"
           eyebrow="Trajetória"
           title={
             <>
@@ -237,7 +240,7 @@ function Lab() {
       <div className="shell">
         <SectionHeading
           id="lab-title"
-          index="08"
+          index="09"
           eyebrow="Fora do expediente"
           title={
             <>
@@ -271,7 +274,7 @@ function Contact() {
       <div className="shell contact-grid">
         <div data-reveal>
           <p className="eyebrow">
-            <span className="eyebrow-index">09</span>
+            <span className="eyebrow-index">10</span>
             Vamos conversar
           </p>
           <h2 id="contato-title">Ainda tem alguém digitando placa de caminhão numa planilha?</h2>
