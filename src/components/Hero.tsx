@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Download, MapPin, MessageCircle } from "lucide-react";
 import { consoleEvents, consoleNodes, heroWords, profile, whatsAppLink, type ConsoleEvent } from "../data/portfolio";
 import { hasFinePointer, prefersReducedMotion, scrambleTo } from "../hooks";
+import { HeroScene } from "./HeroScene";
 
 /* Código mostrado pela lente raio-x (ilustrativo, escrito para o portfólio). */
 const LENS_CODE = [
@@ -160,6 +161,7 @@ export function Hero() {
     );
     visibility.observe(xray);
 
+    const consoleEl = hero.querySelector<HTMLElement>(".console");
     const magnets = Array.from(hero.querySelectorAll<HTMLElement>(".magnetic"));
     const onHeroMove = (event: PointerEvent) => {
       const rect = canvas.getBoundingClientRect();
@@ -168,6 +170,11 @@ export function Hero() {
       queue();
       stopIdle();
       armIdle();
+      if (consoleEl) {
+        const c = consoleEl.getBoundingClientRect();
+        consoleEl.style.setProperty("--gx", `${event.clientX - c.left}px`);
+        consoleEl.style.setProperty("--gy", `${event.clientY - c.top}px`);
+      }
       if (!fine || reduce) return;
       magnets.forEach((el) => {
         const r = el.getBoundingClientRect();
@@ -254,6 +261,7 @@ export function Hero() {
 
         {profile.photo ? (
           <figure className="hero-portrait">
+            <HeroScene />
             <img src={profile.photo} alt={`Ilustração de ${profile.shortName} com headset e camiseta de dev`} width={900} height={942} />
             <figcaption className="portrait-tag">
               <span className="status-dot" aria-hidden="true" />

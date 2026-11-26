@@ -1,0 +1,121 @@
+/* ==========================================================================
+   Vidro + 3D
+   Tudo aqui depende da classe .fx no <html> (main.tsx). ?fx=off desliga.
+   Para remover de vez: apagar este arquivo, o import em main.tsx e o <HeroScene />.
+   ========================================================================== */
+
+/* ------------------------------ cena 3D (Hero) ------------------------------ */
+
+/* centrada no anel do retrato (41% da altura da figura) e bem maior que ela,
+   para os objetos de vidro poderem flutuar ao redor */
+.hero-scene {
+  position: absolute;
+  top: 41%;
+  left: 50%;
+  display: block;
+  width: 184%;
+  aspect-ratio: 1;
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: screen;
+  transition: opacity 1.4s var(--ease-out);
+  pointer-events: none;
+}
+
+/* a animação de entrada não pode ficar presa (fill) ou vira um grupo isolado e o screen deixa de misturar com a página */
+.fx .hero-portrait {
+  animation-fill-mode: backwards;
+}
+
+.has-3d .hero-scene {
+  opacity: 1;
+}
+
+/* o anel de vidro substitui o anel plano; o halo claro continua */
+.has-3d .hero-portrait::before {
+  border-color: transparent;
+  box-shadow: none;
+}
+
+/* --------------------------------- vidro --------------------------------- */
+
+.fx {
+  --glass-fill: linear-gradient(
+      160deg,
+      rgba(255, 255, 255, 0.085),
+      rgba(255, 255, 255, 0.018) 42%,
+      rgba(255, 255, 255, 0.04)
+    ),
+    color-mix(in srgb, var(--bg) 52%, transparent);
+  --glass-blur: blur(24px) saturate(180%);
+  --glass-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 0 -1px 0 rgba(255, 255, 255, 0.03),
+    0 30px 80px -32px #000;
+  /* borda especular: clara no alto à esquerda, lima embaixo à direita */
+  --glass-edge: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.5),
+    rgba(255, 255, 255, 0.06) 28%,
+    rgba(255, 255, 255, 0) 60%,
+    color-mix(in srgb, var(--accent) 45%, transparent)
+  );
+}
+
+.fx .console,
+.fx .term-fab,
+.fx .portrait-tag {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shadow);
+}
+
+.fx .console::after,
+.fx .term-fab::after,
+.fx .portrait-tag::after {
+  position: absolute;
+  inset: -1px;
+  padding: 1px;
+  border-radius: inherit;
+  content: "";
+  background: var(--glass-edge);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  pointer-events: none;
+}
+
+.fx .term-fab {
+  position: fixed;
+}
+
+/* reflexo que segue o mouse no console (--gx/--gy vêm do Hero) */
+.fx .console {
+  isolation: isolate;
+}
+
+.fx .console::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  content: "";
+  background: radial-gradient(
+    420px circle at var(--gx, 30%) var(--gy, -20%),
+    rgba(255, 255, 255, 0.075),
+    transparent 60%
+  );
+  pointer-events: none;
+}
+
+.fx .site-header.is-scrolled {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+}
